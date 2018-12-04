@@ -18,58 +18,6 @@ import os
 import copy
 
 
-def get_edge_weight(G,node1,node2, weight_attribute='weight'):
-    '''Get Edge Weight
-    
-    Returns edge weight for edge in G from node1 to node2
-    If edge exists and has weight_attribute, this value is returned.
-    If edge exists but has not weight_attribute, 1 is returned.
-    Otherwise 0 is returned
-    
-    Input
-    -----
-    G - networkx graph
-    node1 - source node
-    node2 - target node
-    weight_attribute='weight' - attribute of edge containing weight value
-    
-    Return
-    ------
-    edge weight, 1 if edge exists but no weight attribute exists, 0 otherwise.
-    
-    '''
-    edge_data=G.get_edge_data(node1,node2)
-    if edge_data==None:
-        return 0
-    elif weight_attribute in edge_data:
-        return edge_data[weight_attribute]
-    else:
-        return 1
-
-
-def get_node_attribute_value(G,node1, node_attribute=None):
-    '''Get Node Attribute Value
-    
-    Returns node attribute as a float.
-    Otherwise 0.0 is returned
-    
-    Input
-    -----
-    G - networkx graph
-    node1 - node
-    node_attribute=None - attribute of node required
-    
-    Return
-    ------
-    node attribute as a float
-    
-    '''
-    try:
-        node_data=G.node[node1][node_attribute]
-        return float(node_data)
-    except:
-        pass
-    return 0.0
 
 def tr(DAG, output=False):
     """
