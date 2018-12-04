@@ -22,6 +22,60 @@ from collections import defaultdict
 from node_greedy_antichain_partition import coarse_grain
 import scipy.sparse as sparse
 
+def coarse_grain(G,node_to_partition_label, partition_label_to_nodes, weight_attribute='weight',
+                 time_label='t',space_label='x'):
+    ''' Coarse Grain
+    
+    The new graph H has the partitions of G as the nodes in H.
+    An edges from partition1 to partition2 in H is present if
+    there is an edge from a node in G in partition1 of G to 
+    a node in G in partition2.  The total weight of the edge 
+    from partition1 to partition2 in H will be the sum of all 
+    the weights of all such edges in G 
+    from nodes in partition1 to nodes in partition2.
+    If unweighted, weights are assumed to be 1. 
+    If time_label or space_label are set, these are assumed to be numerical 
+    values (e.g. coordinates) and nodes in the new graph get the average value from
+    the partition of nodes they represent in the old graph.
+    
+    
+    Input
+    ----
+    G - networkx graph
+    node_to_partition_label - dictionary from G node key to its partition label
+    partition_label_to_nodes - dictionary from partition label to the set of nodes in G in that partition
+    weight_attribute='weight' - attribute on edge containing edge weight data
+    time_label='t': Node key for time coordinate (used as y/vertical coordinate)
+    space_label='x': Node key for space coordinate (used as x/horizontal coordinate)
+    
+    Return
+    ------
+    H - coarse grained graph, nodes are the partitions labels, weights are under eight_attribute of edges
+    
+    '''
+    H = nx.DiGraph()
+    H.add_nodes_from(list(partition_label_to_nodes.keys()) )
+    for partition in partition_label_to_nodes.keys():
+        nodes_in_partition = partition_label_to_nodes[partition]
+        number_in_partition = len(partition_label_to_nodes[partition])
+        if time_label!=None:
+            average_time = sum([get_node_attribute_value(G,n,node_attribute=time_label) for n in partition_label_to_nodes[partition] ]) / number_in_partition 
+        H.node[partition][time_label]=average_time
+        if space_label!=None:
+            average_space = sum([get_node_attribute_value(G,n,node_attribute=space_label) for n in partition_label_to_nodes[partition] ]) / number_in_partition 
+        H.node[partition][space_label]=average_space
+                
+        
+    for partition1, partition2 in itertools.combinations(partition_label_to_nodes.keys(),2):
+        w= sum( [ get_edge_weight(G,node1,node2, weight_attribute)  for node1, node2  in itertools.product(partition_label_to_nodes[partition1], partition_label_to_nodes[partition2] ) ] )
+        if w>0:
+            H.add_edge(partition1,partition2,weight_attribute=w)                
+        w= sum( [ get_edge_weight(G,node2,node1, weight_attribute)  for node1, node2  in itertools.product(partition_label_to_nodes[partition1], partition_label_to_nodes[partition2]) ] )
+        if w>0:
+            H.add_edge(partition2,partition1,weight_attribute=w)
+    return H    
+            
+
 def similarity_matrix_sparse(DAG, similarity = "intersection",neighbours = "successors"):
     """
     Function to produce a sparse similarity matrix based on neighbourhoods of nodes in DAG.
