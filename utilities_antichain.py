@@ -18,6 +18,31 @@ import os
 import copy
 
 
+
+def get_node_attribute_value(G,node1, node_attribute=None):
+    '''Get Node Attribute Value
+    
+    Returns node attribute as a float.
+    Otherwise 0.0 is returned
+    
+    Input
+    -----
+    G - networkx graph
+    node1 - node
+    node_attribute=None - attribute of node required
+    
+    Return
+    ------
+    node attribute as a float
+    
+    '''
+    try:
+        node_data=G.node[node1][node_attribute]
+        return float(node_data)
+    except:
+        pass
+    return 0.0
+
 def tr(DAG, output=False):
     """
     Transitive reduction,courtesy of JC
