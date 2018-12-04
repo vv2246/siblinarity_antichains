@@ -281,11 +281,11 @@ def node_matrix_greedy_antichain_partition(G,level,
     
     if backwards_forwards_on == True:
         #use in-degree quality with backwards-forwards step (predecessors)
-        adj_matrix, nodedict = similarity_matrix(G, similarity ="intersection",neighbours="predecessors")
+        adj_matrix, nodedict = similarity_matrix_sparse(G, similarity ="intersection",neighbours="predecessors")
     elif forwards_backwards_on== True:
         #use out-degree quality with forwards-backwards step (successors)
         
-        adj_matrix, nodedict = similarity_matrix(G, similarity ="intersection",neighbours="successors")
+        adj_matrix, nodedict = similarity_matrix_sparse(G, similarity ="intersection",neighbours="successors")
     Q = Quality_matrix(nodedict,adj_matrix)
     Q_method = Q.delta_strength_quality_unnormalised
     Q_total = Q.total_strength_quality_unnormalised
