@@ -3,6 +3,7 @@
 Created on Mon Oct  1 10:20:54 2018
 @author: Vaiva
 ***********IMPORTANT NOTE***************
+Only implemented for directed networks without cycles. For cyclic networks, use node_greedy_antichain_partition
 We can only use numpy implementation on DAGs. The coarse-grained network is likely to be
 cyclic, so it is better to use matrices only in the first step, where 
 the heavy linear algebra lifting is done. After this, we use the usual weakly_connected_graph antichain check.
