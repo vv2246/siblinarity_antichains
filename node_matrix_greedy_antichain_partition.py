@@ -19,7 +19,6 @@ import math
 import numpy as np
 import networkx as nx
 from collections import defaultdict
-from node_greedy_antichain_partition import coarse_grain
 import scipy.sparse as sparse
 
 def coarse_grain(G,node_to_partition_label, partition_label_to_nodes, weight_attribute='weight',
