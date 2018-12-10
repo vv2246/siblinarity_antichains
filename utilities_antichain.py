@@ -17,6 +17,31 @@ import matplotlib.pyplot as plt
 import os
 import copy
 
+def overlappiness(graph,nodelist,neighbours ="successors"):
+    """
+    Overlappiness is the amount of overlap between neighours of nodes in a nodelist.
+    Works for predecessors/successors
+    Implemented for antichains
+    
+    """
+    
+    nset = set()
+    if neighbours == "successors":
+        for n in nodelist:
+            nset.update(set(graph.successors(n)))
+        try:
+            return max([graph.out_degree(n) for n in nodelist])/len(nset)
+        except:
+                return 0
+    else:
+        
+        for n in nodelist:
+            nset.update(set(graph.predecessors(n)))
+        try:
+            return max([graph.in_degree(n) for n in nodelist])/len(nset)
+        except:
+            return 0
+
 
 
 def tr(DAG, output=False):
