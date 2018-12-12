@@ -322,6 +322,7 @@ def node_matrix_greedy_antichain_partition(G,level,
     Q_check_on=False - check to see if change in Q is correct by printing out total value and changes
     weight_attribute - edge attribute of weight. if None, unweighted quality functions are used. Note, weight must be integer
     
+    
     Return
     ------
     tuple node_to_partition_label, partition_label_to_nodes 
@@ -369,11 +370,12 @@ def node_matrix_greedy_antichain_partition(G,level,
     if Q_check_on:
         Q_total_current= Q_total(partition_label_to_nodes.values())
         print (' Initial Q value is '+str(Q_total_current))
-    
+    """
     if level==0:
         L_max = len(nx.dag_longest_path(G))
         path_matrix = find_paths_sparse(nx.adjacency_matrix(G,list(nodedict.keys())),L_max)
         #path_matrix = find_paths(nx.adjacency_matrix(G,list(nodedict.keys())).todense(),L_max)#path_matrix = has_path_matrix(G,nodedict)#(adj_matrix,l_max)
+    """
     count= 0
     
     while moved == True and number_sweeps < max_number_sweeps:
@@ -428,13 +430,15 @@ def node_matrix_greedy_antichain_partition(G,level,
             # Check each ac_nn partition to make sure it is not weakly connected to partition ac
             # then calculate the modularity change if partitions ac and ac_nn are merged
             for ac_nn in bf_nearest_neighbour_partitions:
+                """
                 if level ==0:
                     if not  is_weakly_connected_matrix(path_matrix,nodedict,[n],partition_label_to_nodes[ac_nn] ) :
                         delta_Q_nn[ac_nn] = Q_method([n], partition_label_to_nodes[ac_nn])
                         #print("level",level,"using path matrix", "no of nodes =" , G.number_of_nodes())
                 else:
-                    if not is_weakly_connected(G,[n],partition_label_to_nodes[ac_nn] ):
-                        delta_Q_nn[ac_nn] = Q_method([n], partition_label_to_nodes[ac_nn])
+                """
+                if not is_weakly_connected(G,[n],partition_label_to_nodes[ac_nn] ):
+                    delta_Q_nn[ac_nn] = Q_method([n], partition_label_to_nodes[ac_nn])
                         #print("level",level,"using networkx", "no of nodes =" , G.number_of_nodes())
             if len(delta_Q_nn)> 0:
                 # Note nice use of operator.itemgetter to get key with largest value
