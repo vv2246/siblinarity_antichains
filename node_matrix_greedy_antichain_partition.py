@@ -131,39 +131,6 @@ def coarse_grain(G,node_to_partition_label, partition_label_to_nodes, weight_att
     return H    
             
 
-def similarity_matrix_sparse(DAG, similarity = "intersection",neighbours = "successors"):
-    """
-    Function to produce a sparse similarity matrix based on neighbourhoods of nodes in DAG.
-    
-    Input
-    -----
-    DAG - networkx directed acyclic graph
-    similarity - type of similarity of sets. Currently only implemented for the size of intersection
-    neighbours - type of neighbours to consider in the similarity. Can be either successors or predecessors
-    
-    Return
-    -----
-    A - scipy sparse symmetric similarity matrix where entry A[i,j] represents similarity between nodes of indices i, j 
-    nodedict - dictionary of node names and their indices in the similarity matrix
-    """
-    
-    nodes = list(DAG.nodes())
-    nodedict = {}
-    for i in range(len(nodes)):
-        nodedict[nodes[i]] = i
-    nodelist = list(nodedict.keys())
-        
-    A = (nx.adjacency_matrix(DAG,nodelist))
-    
-    if similarity == "intersection" and neighbours == "successors":
-        A = A.dot(A.transpose())
-        A.setdiag(0)
-        return A,nodedict
-    
-    elif similarity == "intersection" and neighbours == "predecessors":
-        A=A.transpose().dot(A)
-        A.setdiag(0)
-        return A,nodedict
 
 
 def similarity_matrix(DAG, similarity = "intersection",neighbours = "successors"):
@@ -200,6 +167,44 @@ def similarity_matrix(DAG, similarity = "intersection",neighbours = "successors"
         np.fill_diagonal(A,0)
         return A,nodedict
     
+def similarity_matrix_sparse(DAG, similarity = "intersection",neighbours = "successors"):
+    """
+    Function to produce a sparse similarity matrix based on neighbourhoods of nodes in DAG.
+    
+    Input
+    -----
+    DAG - networkx directed acyclic graph
+    similarity - type of similarity of sets. Currently only implemented for the size of intersection
+    neighbours - type of neighbours to consider in the similarity. Can be either successors or predecessors or both
+    
+    Return
+    -----
+    A - scipy sparse symmetric similarity matrix where entry A[i,j] represents similarity between nodes of indices i, j 
+    nodedict - dictionary of node names and their indices in the similarity matrix
+    """
+    
+    nodes = list(DAG.nodes())
+    nodedict = {}
+    for i in range(len(nodes)):
+        nodedict[nodes[i]] = i
+    nodelist = list(nodedict.keys())
+        
+    A = (nx.adjacency_matrix(DAG,nodelist))
+    
+    if similarity == "intersection" and neighbours == "successors":
+        A = A.dot(A.transpose())
+        A.setdiag(0)
+        return A,nodedict
+    
+    elif similarity == "intersection" and neighbours == "predecessors":
+        A=A.transpose().dot(A)
+        A.setdiag(0)
+        return A,nodedict
+    elif similarity == "intersection" and neighbours == "both":
+        A=A.transpose().dot(A) +A.dot(A.transpose())
+        A.setdiag(0)
+        #print(A)
+        return A,nodedict
     
 
 def has_path_matrix(DAG,nodedict,cutoff = 350):
@@ -286,7 +291,7 @@ def is_weakly_connected_matrix(path_matrix, nodedict, source_nodes,target_nodes)
     return False
 
 
-def node_matrix_greedy_antichain_partition(G,level,
+def node_matrix_greedy_antichain_partition(G,level,Lambda,
                             random_on=False,seed=None, max_number_sweeps=None,
                             backwards_forwards_on=True,forwards_backwards_on=False,
                             Q_check_on=True, weight_attribute = "weight"):    
@@ -334,16 +339,18 @@ def node_matrix_greedy_antichain_partition(G,level,
     if not (forwards_backwards_on or backwards_forwards_on):
         raise  ValueError("At least one of forwards_backwards_on or backwards_forwards_on parameters must be True")
 
+    if backwards_forwards_on == True and forwards_backwards_on == True:
+        adj_matrix, nodedict = similarity_matrix_sparse(G, similarity ="intersection",neighbours="both")
     
-    
-    if backwards_forwards_on == True:
+    elif backwards_forwards_on == True and forwards_backwards_on==False:
         #use in-degree quality with backwards-forwards step (predecessors)
         adj_matrix, nodedict = similarity_matrix_sparse(G, similarity ="intersection",neighbours="predecessors")
-    elif forwards_backwards_on== True:
+    elif forwards_backwards_on== True and backwards_forwards_on ==  False:
         #use out-degree quality with forwards-backwards step (successors)
         
         adj_matrix, nodedict = similarity_matrix_sparse(G, similarity ="intersection",neighbours="successors")
-    Q = Quality_matrix(nodedict,adj_matrix)
+        
+    Q = Quality_matrix(nodedict,adj_matrix,Lambda)
     Q_method = Q.delta_strength_quality_unnormalised
     Q_total = Q.total_strength_quality_unnormalised
 
@@ -479,7 +486,7 @@ def node_matrix_greedy_antichain_partition(G,level,
 
 
 
-def matrix_node_recursive_antichain_partition(G,time_label='t',space_label='x',
+def matrix_node_recursive_antichain_partition(G,Lambda,time_label='t',space_label='x',
                             random_on=False,seed=None, max_number_sweeps=None,
                             backwards_forwards_on=True,forwards_backwards_on=False,
                             Q_check_on=True,
@@ -505,12 +512,12 @@ def matrix_node_recursive_antichain_partition(G,time_label='t',space_label='x',
                             Q_check_on=Q_check_on,
                             plot_on=plot_on,
                             filenameroot=filenameroot,extlist=extlist,
-                            ScreenOn=ScreenOn)
+                            ScreenOn=ScreenOn,Lambda=Lambda)
 
     return result_list
 
     
-def _matrix_node_recursive_antichain_partition_step(G,time_label='t',space_label='x',
+def _matrix_node_recursive_antichain_partition_step(G,Lambda,time_label='t',space_label='x',
                                              level=0,result_list=None,
                                              random_on=False,
                                              seed=None, max_number_sweeps=None,
@@ -530,7 +537,7 @@ def _matrix_node_recursive_antichain_partition_step(G,time_label='t',space_label
                             backwards_forwards_on=backwards_forwards_on,
                             forwards_backwards_on=forwards_backwards_on,
                             Q_check_on=Q_check_on,
-                            level = level)
+                            level = level, Lambda = Lambda)
     if len(partition_label_to_nodes.keys()) == G.number_of_nodes():
         return 
     # optional plot
@@ -564,14 +571,15 @@ def _matrix_node_recursive_antichain_partition_step(G,time_label='t',space_label
                             plot_on=plot_on,
                             filenameroot=filenameroot,
                             extlist=extlist,
-                            ScreenOn=ScreenOn
+                            ScreenOn=ScreenOn,
+                            Lambda = Lambda      
                             )  
     result_list[level] = {'level':level, 'n_to_p':node_to_partition_label, 'p_to_n':partition_label_to_nodes }
     return 
 
 if __name__ == "__main__":  
     G = Model.spatial_antichain_dag(100,10)
-    result_list = matrix_node_recursive_antichain_partition(G)
+    result_list = matrix_node_recursive_antichain_partition(G,Lambda = 1)
     node_partition = {}
     
     for n in G.nodes():
