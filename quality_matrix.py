@@ -10,14 +10,15 @@ class Quality_matrix:
     Quality measures for use in antichains. Similarity matrix implementation.
     '''
     # class variables
-    def __init__(self,node_id_dict,similarity_matrix):
+    def __init__(self,node_id_dict,similarity_matrix,Lambda):
         '''Initial Quality Measures
         '''
         self.similarity_matrix = similarity_matrix
         self.node_id_dict = node_id_dict
         self.strength = similarity_matrix.sum(axis = 0)
         self.strength = {n:self.strength[0,node_id_dict[n]] for n in node_id_dict.keys()}#sum over rows?
-        self.total_weight = similarity_matrix.sum()/2
+        self.total_weight = similarity_matrix.sum()#/2
+        self.Lambda = Lambda
         
     def delta_strength_quality_unnormalised(self,partition1,partition2):
         '''Using in-strength null model calculate the change in unnormalised quality if two partitions are combined.
@@ -46,11 +47,16 @@ class Quality_matrix:
         Return
         Contribution of the quality Q from the all pairs of nodes with one from partition1, second from partition2 
         '''
+        S = 0
+        for node1 in partition1:
+            for node2 in partition2:
+                #if node1!= node2:
+                S+=self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]]- self.Lambda*self.strength[node1]*self.strength[node2]/self.total_weight 
         
-        
-        return sum([self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]]
-                   - self.strength[node1]*self.strength[node2]/self.total_weight 
-                   for node1, node2  in itertools.product(partition1, partition2) ] )
+        return S
+        #return sum([self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]]
+        #           - self.Lambda*self.strength[node1]*self.strength[node2]/self.total_weight 
+        #           for node1, node2  in itertools.product(partition1, partition2) ] )
         
     
         
@@ -80,7 +86,20 @@ class Quality_matrix:
         Total value of the quality Q from the all pairs of nodes 
         '''
 
-        return sum( [ 
-                        sum( [  self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]]    - self.strength[node1]*self.strength[node2]/(self.total_weight)
-                              for node1, node2 in itertools.combinations(p,2)] ) 
-                    for p in partitions ] )
+        S= 0
+        for p in partitions:
+            for node1 in p:
+                for node2 in p:#itertools.combinations(p,2):
+                    #print(self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]], "-",self.strength[node1],"x",self.strength[node2],"by",self.total_weight )
+                
+                    S+=(self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]]  - self.Lambda*self.strength[node1]*self.strength[node2]/(self.total_weight))
+
+        return S
+        #return sum( [ 
+        #                sum( [  self.similarity_matrix[self.node_id_dict[node1],self.node_id_dict[node2]]  
+        #                - self.Lambda*self.strength[node1]*self.strength[node2]/(self.total_weight)
+        #                      for node1, node2 in itertools.combinations(p,2)] ) 
+        #            for p in partitions ] )
+    
+    
+    
