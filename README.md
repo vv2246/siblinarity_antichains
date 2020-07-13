@@ -39,5 +39,7 @@ Code for antichains written by Vaiva Vasiliauskaite v.vasiliauskaite16@imperial.
   where W = total strength of edges in the graph (($sum_{i,j}S_ij)/2$),
  $ S_{ij}$ - i,j^th entry in the similarity matrix. For instance, $A.A^T$ is successors-based similarity;
           $A^T.A$ is predecessors-based similarity.   
+	  
+	  <img src="https://render.githubusercontent.com/render/math?math=e^{i %2B\pi} =x%2B1">
           
 
