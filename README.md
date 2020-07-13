@@ -1,17 +1,15 @@
 # Siblinarity-based antichain partitioning of DAGs
 
-**Antichains code**
+**Siblinarity-based antichain partitioning of DAGs**
 
 Code for antichains written by Vaiva Vasiliauskaite v.vasiliauskaite16@imperial.ac.uk and Tim Evans t.evans@imperial.ac.uk .
 
 
-*Added Tim's standard .gitignore file to ensure only key files are uploaded. Edit as needed.*
+#*Added Tim's standard .gitignore file to ensure only key files are uploaded. Edit as needed.*
 
 ---
 
 ## Source Files
-
-Tell me what they do
 
 1. node_matrix_greedy_antichain_partition.py
 	This is the main file, which contains function matrix_node_recursive_antichain_partition. The function takes into its argument a graph,
@@ -37,12 +35,9 @@ Tell me what they do
 4. Quality_matrix
   Quality measures for use in antichains. Similarity matrix implementation. Definition is that used for weighted graph.
 
-  $Q = \sum_{u \in partition1} \sum_{v \in partition2}( S_ij- k_i*k_j/W )$
+  $Q = \sum_{u \in partition1} \sum_{v \in partition2}( S_ij- k_i k_j/W )$
   where W = total strength of edges in the graph (($sum_{i,j}S_ij)/2$),
  $ S_{ij}$ - i,j^th entry in the similarity matrix. For instance, $A.A^T$ is successors-based similarity;
           $A^T.A$ is predecessors-based similarity.   
           
----
-
-## Next Section
 
