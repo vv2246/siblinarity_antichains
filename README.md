@@ -5,6 +5,7 @@
 Code for antichains written by Vaiva Vasiliauskaite v.vasiliauskaite16@imperial.ac.uk and Tim Evans t.evans@imperial.ac.uk .
 
 Vasiliauskaite, V., Evans, T.S. Making communities show respect for order. Appl Netw Sci **5**, 15 (2020). https://doi.org/10.1007/s41109-020-00255-5
+
 ---
 
 ## Source Files
