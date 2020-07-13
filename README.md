@@ -35,7 +35,7 @@ Code for antichains written by Vaiva Vasiliauskaite v.vasiliauskaite16@imperial.
 4. Quality_matrix
   Quality measures for use in antichains. Similarity matrix implementation. Definition is that used for weighted graph.
 
-  $Q = \sum_{u \in partition1} \sum_{v \in partition2}( S_ij- k_i k_j/W )$
+  \begin{equation}Q = \sum_{u \in partition1} \sum_{v \in partition2}( S_ij- k_i k_j/W )\end{equation}
   where W = total strength of edges in the graph (($sum_{i,j}S_ij)/2$),
  $ S_{ij}$ - i,j^th entry in the similarity matrix. For instance, $A.A^T$ is successors-based similarity;
           $A^T.A$ is predecessors-based similarity.   
