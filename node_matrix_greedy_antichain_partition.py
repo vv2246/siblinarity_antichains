@@ -710,19 +710,6 @@ def _matrix_node_recursive_antichain_partition_step(G,Lambda,with_replacement,ti
 
 if __name__ == "__main__":  
     
-    
-    
-    
-    G = nx.DiGraph()
-    G.add_edge(1,2)
-    G.add_edge(1,3)
-    G.add_edge(2,4)
-    G.add_edge(3,5)
-    G.add_edge(4,6)
-    G.add_edge(5,6)
-    
-    
-    
     G = random_dag(100,0.1)
     result_list=matrix_node_recursive_antichain_partition(G,forwards_backwards_on = True, 
                                                           backwards_forwards_on = False, 
@@ -730,10 +717,7 @@ if __name__ == "__main__":
                                                           Lambda =1,with_replacement=False,
                                                           space_label=None,time_label=None)
     
-    
-    
     node_partition = {}
-    
     for n in G.nodes():
     
         p_at_level= result_list[0]["n_to_p"][n]
